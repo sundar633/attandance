@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - MSSquare Technologies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9f9f9;
+            background-image: url('assets/logo1');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Helvetica', sans-serif; /* Changed font */
+            color: #FFD700;
+        }
+        .current-time {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #333;
+        }
+        .container {
+            margin-top: 30px;
+            width: 90%;
+            max-width: 600px;
+        }
+        .box {
+            margin-top: 30px;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+        .box button {
+            padding: 15px 30px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .box button:hover {
+            background-color: #0056b3;
+        }
+        .back-button, .check-attendance-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .back-button a, .check-attendance-button a {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-button a:hover, .check-attendance-button a:hover {
+            background-color: #5a6268;
+        }
+        .contact {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .contact a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .contact a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .box {
+                padding: 20px;
+                font-size: 14px;
+            }
+            .box button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+            .back-button a, .check-attendance-button a {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+        }
+
+        /* Circle Animation */
+        .circle {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 5px solid transparent;
+            border-top: 5px solid #007bff;
+            animation: circleAnimation 2s linear infinite;
+        }
+
+        @keyframes circleAnimation {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+                border-top-color: #007bff;
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(180deg);
+                border-top-color: #28a745;
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+                border-top-color: #dc3545;
+            }
+        }
+
+        /* Status Message Box */
+        .status-message {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 18px;
+            color: white;
+        }
+        .status-message.success {
+            background-color: #28a745;
+        }
+        .status-message.error {
+            background-color: #dc3545;
+        }
+
+    </style>
+</head>
+<body>
+    <header>MSSQUARE TECHNOLOGIES</header>
+    
+    <!-- Current Date and Time -->
+    <div class="current-time" id="current-time"></div>
+
+    <div class="container">
+        <div class="box">
+            <h3>Mark Attendance - Morning</h3>
+            <div class="circle" id="circle-morning"></div>
+            <div class="status-message success" id="status-morning-success">Attendance Marked!</div>
+            <div class="status-message error" id="status-morning-error">Attendance Not Marked</div>
+            <button onclick="markAttendance('morning', '10:30', '11:01', 'circle-morning', 'status-morning-success', 'status-morning-error')">Mark Attendance</button>
+        </div>
+
+        <div class="box">
+            <h3>Mark Attendance - Afternoon</h3>
+            <div class="circle" id="circle-afternoon"></div>
+            <div class="status-message success" id="status-afternoon-success">Attendance Marked!</div>
+            <div class="status-message error" id="status-afternoon-error">Attendance Not Marked</div>
+            <button onclick="markAttendance('afternoon', '17:30', '19:30', 'circle-afternoon', 'status-afternoon-success', 'status-afternoon-error')">Mark Attendance</button>
+        </div>
+
+        <!-- Check Attendance Button -->
+        <div class="check-attendance-button">
+            <a href="javascript:void(0);" onclick="checkAttendance()">Check Attendance</a>
+        </div>
+
+        <!-- Back Button -->
+        <div class="back-button">
+            <a href="login.html">Back</a>
+        </div>
+
+        <div class="contact">
+            <p> <a href="mailto:support@mssquaretech.com">Contact Us</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Set the current date and time dynamically
+        function updateDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString();
+            const time = now.toLocaleTimeString();
+
+            document.getElementById('current-time').textContent = `Date: ${date} | Time: ${time}`;
+        }
+
+        setInterval(updateDateTime, 1000); // Update time every second
+
+        const targetLatitude = 17.0575; // Latitude for the new location
+        const targetLongitude = 81.7517; // Longitude for the new location
+        const maxDistance = 0.9; // Increase max distance to 0.9 km
+
+        function markAttendance(time, startTime, endTime, circleId, successId, errorId) {
+            // Show the animated circle
+            const circle = document.getElementById(circleId);
+            const successMessage = document.getElementById(successId);
+            const errorMessage = document.getElementById(errorId);
+            
+            // Show the animated circle
+            circle.style.display = "block";
+            successMessage.style.display = "none"; // Hide success message
+            errorMessage.style.display = "none"; // Hide error message
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    const distance = calculateDistance(latitude, longitude, targetLatitude, targetLongitude);
+
+                    const now = new Date();
+                    const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+                    const currentDate = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+                    console.log(`Current Location: Latitude: ${latitude}, Longitude: ${longitude}`);
+                    console.log(`Distance from target location: ${distance} km`);
+                    console.log(`Current Time: ${currentTime}, Attendance Time Range: ${startTime} - ${endTime}`);
+
+                    setTimeout(() => {
+                        // Hide the animation after a delay
+                        circle.style.display = "none";
+
+                        if (distance <= maxDistance && isWithinTimeRange(currentTime, startTime, endTime)) {
+                            successMessage.style.display = "block"; // Show success message
+
+                            // Send attendance data to the server
+                            fetch('/mark-attendance', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ date: currentDate, time: currentTime, status: 'present' })
+                            })
+                            .then(response => response.json())
+                            .then(data => console.log('Attendance marked successfully:', data))
+                            .catch(error => console.error('Error marking attendance:', error));
+                        } else {
+                            errorMessage.style.display = "block"; // Show error message
+                        }
+                    }, 3000); // Wait for 3 seconds before displaying result
+                }, () => {
+                    console.log('Geolocation is not available');
+                    errorMessage.style.display = "block"; // Show error message
+                });
+            } else {
+                console.log('Geolocation is not supported by this browser.');
+                errorMessage.style.display = "block"; // Show error message
+            }
+        }
+
+        // Function to calculate the distance between two geographic coordinates (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth radius in kilometers
+            const dLat = degToRad(lat2 - lat1);
+            const dLon = degToRad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in kilometers
+        }
+
+        // Function to convert degrees to radians
+        function degToRad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // Function to check if the current time is within the given time range
+        function isWithinTimeRange(currentTime, startTime, endTime) {
+            return currentTime >= startTime && currentTime <= endTime;
+        }
+
+        // Function to check attendance
+        function checkAttendance() {
+            window.location.href = 'attendance-list.html'; // Redirect to attendance list page
+        }
+    </script>
+</body>
+</html>
